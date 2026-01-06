@@ -1,0 +1,1029 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Rocco Kisses!</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        :root {
+            --bg-color-light: #f7f0e3;
+            --panel-color-light: #e8d9c4;
+            --text-color-light: #4a3b2a;
+            --button-bg-light: #d6bfa0;
+            --button-hover-light: #c7ae8d;
+
+            --bg-color-dark: #111111;
+            --panel-color-dark: #1e1e1e;
+            --text-color-dark: #f5f5f5;
+            --button-bg-dark: #333333;
+            --button-hover-dark: #444444;
+
+            --accent-gold: #ffd700;
+            --accent-gold-dark: #b8860b;
+        }
+
+        body[data-theme="light"] {
+            background: var(--bg-color-light);
+            color: var(--text-color-light);
+        }
+
+        body[data-theme="dark"] {
+            background: var(--bg-color-dark);
+            color: var(--text-color-dark);
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        h1, h2, h3 {
+            margin: 5px 0;
+        }
+
+        #topBar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 600px;
+            margin: 0 auto 10px auto;
+        }
+
+        #themeToggle {
+            padding: 6px 10px;
+            font-size: 12px;
+            border-radius: 20px;
+            border: none;
+            cursor: pointer;
+        }
+
+        body[data-theme="light"] #themeToggle {
+            background: var(--button-bg-light);
+            color: var(--text-color-light);
+        }
+
+        body[data-theme="dark"] #themeToggle {
+            background: var(--button-bg-dark);
+            color: var(--text-color-dark);
+        }
+
+        #roccoWrapper {
+            position: relative;
+            display: inline-block;
+            margin-top: 10px;
+        }
+
+        #clickImg {
+            width: 60vw;
+            max-width: 300px;
+            border-radius: 20px;
+            cursor: pointer;
+            position: relative;
+            z-index: 2;
+            transition: box-shadow 0.3s ease;
+        }
+
+        #clickImg.clicked {
+            animation: pop 0.15s ease-out;
+        }
+
+        @keyframes pop {
+            0% { transform: scale(1); }
+            40% { transform: scale(1.12); }
+            100% { transform: scale(1); }
+        }
+
+        #roccoWrapper.glow #clickImg {
+            box-shadow: 0 0 18px rgba(255, 215, 0, 0.8);
+        }
+
+        /* Buff timers UNDER Rocco */
+        #buffTimers {
+            margin-top: 10px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .buffCircle {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+            display: none;
+        }
+
+        .buffFill {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: conic-gradient(rgba(255,255,255,0.9) 0deg, rgba(255,255,255,0) 0deg);
+            transition: background 0.2s linear;
+        }
+
+        #buffRing {
+            border-color: rgba(255, 215, 0, 0.5);
+        }
+
+        #buffRingFill {
+            background: conic-gradient(rgba(255, 215, 0, 0.9) 0deg, rgba(255, 215, 0, 0) 0deg);
+        }
+
+        #parkRing {
+            border-color: rgba(100, 200, 255, 0.5);
+        }
+
+        #parkRingFill {
+            background: conic-gradient(rgba(100, 200, 255, 0.9) 0deg, rgba(100, 200, 255, 0) 0deg);
+        }
+
+        .shop, .achievements {
+            margin-top: 20px;
+            padding: 15px;
+            width: 95%;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+            border-radius: 12px;
+            box-shadow: 0 0 10px #00000055;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        body[data-theme="light"] .shop,
+        body[data-theme="light"] .achievements {
+            background: var(--panel-color-light);
+            color: var(--text-color-light);
+        }
+
+        body[data-theme="dark"] .shop,
+        body[data-theme="dark"] .achievements {
+            background: var(--panel-color-dark);
+            color: var(--text-color-dark);
+        }
+
+        button {
+            padding: 10px 14px;
+            font-size: 14px;
+            margin-top: 8px;
+            width: 100%;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            transition: background 0.2s ease, color 0.2s ease;
+        }
+
+        body[data-theme="light"] button {
+            background: var(--button-bg-light);
+            color: var(--text-color-light);
+        }
+
+        body[data-theme="light"] button:hover {
+            background: var(--button-hover-light);
+        }
+
+        body[data-theme="dark"] button {
+            background: var(--button-bg-dark);
+            color: var(--text-color-dark);
+        }
+
+        body[data-theme="dark"] button:hover {
+            background: var(--button-hover-dark);
+        }
+
+        .achievement {
+            font-size: 12px;
+            text-align: left;
+            margin: 4px 0;
+        }
+
+        body[data-theme="dark"] .achievement.unlocked {
+            color: var(--accent-gold);
+        }
+
+        body[data-theme="light"] .achievement.unlocked {
+            color: var(--accent-gold-dark);
+        }
+
+        .particle {
+            position: fixed;
+            color: var(--accent-gold);
+            font-size: 16px;
+            pointer-events: none;
+            animation: floatUp 0.7s ease-out forwards;
+            z-index: 9999;
+        }
+
+        @keyframes floatUp {
+            from { opacity: 1; transform: translateY(0); }
+            to { opacity: 0; transform: translateY(-40px); }
+        }
+
+        /* Prestige Tree Modal */
+        #prestigeOverlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9990;
+        }
+
+        #prestigeModal {
+            width: 90%;
+            max-width: 900px;
+            border-radius: 16px;
+            padding: 15px;
+            position: relative;
+            box-shadow: 0 0 20px #000000aa;
+            overflow: hidden;
+        }
+
+        body[data-theme="light"] #prestigeModal {
+            background: #f3e4cf;
+            color: #4a3b2a;
+        }
+
+        body[data-theme="dark"] #prestigeModal {
+            background: #1b1b1f;
+            color: #f5f5f5;
+        }
+
+        #prestigeHeader {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        #prestigeClose {
+            font-size: 20px;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            color: inherit;
+            padding: 0 6px;
+        }
+
+        #prestigeTitle {
+            margin: 0;
+        }
+
+        #prestigePointsDisplay {
+            font-size: 13px;
+            margin-bottom: 8px;
+        }
+
+        #prestigeTree {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .prestige-tier {
+            border-radius: 10px;
+            padding: 10px;
+        }
+
+        body[data-theme="light"] .prestige-tier {
+            background: #e8d9c4;
+            border: 1px solid #d2c0a3;
+        }
+
+        body[data-theme="dark"] .prestige-tier {
+            background: #252530;
+            border: 1px solid #3a3a4a;
+        }
+
+        .prestige-tier.locked {
+            opacity: 0.4;
+        }
+
+        .prestige-tier h4 {
+            margin: 0 0 6px 0;
+        }
+
+        .prestige-upgrade {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 4px 0;
+            font-size: 13px;
+        }
+
+        .prestige-upgrade button {
+            width: auto;
+            padding: 4px 8px;
+            font-size: 12px;
+            margin-top: 0;
+        }
+
+        .prestige-upgrade span.status {
+            margin-left: 6px;
+            font-size: 12px;
+        }
+
+        .prestige-upgrade.purchased {
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body data-theme="dark">
+
+    <div id="topBar">
+        <div><strong>Rocco Kisses!</strong></div>
+        <button id="themeToggle">🌙 Dark Mode</button>
+    </div>
+
+    <h2>Rocco’s Kisses: <span id="points">0</span></h2>
+    <h3>Kisses per Click: <span id="perClick">1</span></h3>
+    <h3>Kisses per Second: <span id="autoCount">0</span></h3>
+    <h3>Prestige Level: <span id="prestige">0</span></h3>
+
+    <div id="roccoWrapper">
+        <img id="clickImg" src="rocco.png" alt="Rocco">
+        <div id="buffTimers">
+            <div id="buffRing" class="buffCircle">
+                <div id="buffRingFill" class="buffFill"></div>
+            </div>
+            <div id="parkRing" class="buffCircle">
+                <div id="parkRingFill" class="buffFill"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="shop">
+        <h2>Dog Shop</h2>
+
+        <button id="buyTreat">
+            Dog Treat (+1 KPC) — Cost: <span id="treatCost">20</span> Rocco’s Kisses
+        </button>
+
+        <button id="buyToy">
+            Chew Toy (+1 KPS) — Cost: <span id="toyCost">100</span> Rocco’s Kisses
+        </button>
+
+        <button id="buyLeash">
+            Leash Upgrade (+10% all production) — Cost: <span id="leashCost">500</span> Rocco’s Kisses
+        </button>
+
+        <button id="buyParkPass">
+            Dog Park Pass (x3 for 3 minutes) — Cost: <span id="parkCost">1000</span> Rocco’s Kisses
+        </button>
+
+        <button id="buyGoldenBone">
+            Golden Bone (+25% boost for 10 minutes) — Cost: <span id="boneCost">5000</span> Rocco’s Kisses
+        </button>
+
+        <button id="prestigeBtn">
+            Prestige (Reset for +10% permanent bonus) — Requires: 10,000 Rocco’s Kisses
+        </button>
+
+        <button id="prestigeTreeBtn">Prestige Tree</button>
+
+        <button id="saveBtn">Save Game</button>
+        <button id="loadBtn">Load Game</button>
+        <button id="resetBtn">Reset</button>
+    </div>
+
+    <div class="achievements">
+        <h2>Achievements</h2>
+        <div id="achList"></div>
+    </div>
+
+    <!-- Prestige Tree Modal -->
+    <div id="prestigeOverlay">
+        <div id="prestigeModal">
+            <div id="prestigeHeader">
+                <h3 id="prestigeTitle">Prestige Tree</h3>
+                <button id="prestigeClose">✖</button>
+            </div>
+            <div id="prestigePointsDisplay">
+                Prestige Level: <span id="prestigeLevelDisplay">0</span> |
+                Prestige Points: <span id="prestigePoints">0</span>
+            </div>
+            <div id="prestigeTree"></div>
+        </div>
+    </div>
+
+    <audio id="barkSound">
+        <source src="https://actions.google.com/sounds/v1/animals/dog_bark.ogg">
+    </audio>
+
+    <script>
+        let points = 0;
+        let perClick = 1;
+        let autoClickers = 0;
+        let prestige = 0;
+
+        let treatCost = 20;
+        let toyCost = 100;
+        let leashCost = 500;
+        let parkCost = 1000;
+        let boneCost = 5000;
+
+        let leashBonus = 0;
+        let goldenBones = 0;
+        let parkActive = false;
+        let parkEndTime = 0;
+
+        let totalPointsEarned = 0;
+        let parkUses = 0;
+
+        let goldenBoneBuffActive = false;
+        let goldenBoneBuffEndTime = 0;
+
+        let parkBuffActive = false;
+        let parkBuffEndTime = 0;
+
+        let prestigePoints = 0;
+        let prestigeUpgrades = {
+            P1: false,
+            P2: false,
+            P3: false,
+            P4: false,
+            P5: false,
+            P6: false,
+            P7: false,
+            P8: false,
+            P9: false
+        };
+
+        let clickMult = 1;
+        let autoMult = 1;
+        let buffDurationMult = 1;
+        let offlineMult = 1;
+        let globalMultBonus = 1;
+        let goldenBoneExtraMinutes = 0;
+        let parkExtraMinutes = 0;
+
+        const achievements = [
+            { id: "firstTreat", name: "First Treat!", desc: "Buy 1 Dog Treat", unlocked: false },
+            { id: "toyCollector", name: "Toy Collector", desc: "Own 10 Chew Toys", unlocked: false },
+            { id: "walkTime", name: "Walk Time!", desc: "Buy 1 Leash Upgrade", unlocked: false },
+            { id: "parkRegular", name: "Park Regular", desc: "Use Dog Park Pass 5 times", unlocked: false },
+            { id: "goldenPup", name: "Golden Pup", desc: "Buy 1 Golden Bone", unlocked: false },
+            { id: "prestigePup", name: "Prestige Pup", desc: "Prestige once", unlocked: false },
+            { id: "millionaire", name: "Rocco’s Favorite Human", desc: "Earn 1,000,000 Rocco’s Kisses", unlocked: false },
+            { id: "dogTycoon", name: "Dog Tycoon", desc: "Own 10 Golden Bones", unlocked: false }
+        ];
+
+        const achList = document.getElementById("achList");
+        const clickImg = document.getElementById("clickImg");
+        const barkSound = document.getElementById("barkSound");
+        const themeToggle = document.getElementById("themeToggle");
+
+        const roccoWrapper = document.getElementById("roccoWrapper");
+        const buffRing = document.getElementById("buffRing");
+        const buffRingFill = document.getElementById("buffRingFill");
+        const parkRing = document.getElementById("parkRing");
+        const parkRingFill = document.getElementById("parkRingFill");
+
+        const prestigeOverlay = document.getElementById("prestigeOverlay");
+        const prestigeTreeBtn = document.getElementById("prestigeTreeBtn");
+        const prestigeClose = document.getElementById("prestigeClose");
+        const prestigePointsSpan = document.getElementById("prestigePoints");
+        const prestigeLevelDisplay = document.getElementById("prestigeLevelDisplay");
+        const prestigeTreeContainer = document.getElementById("prestigeTree");
+
+        function recalcPrestigeEffects() {
+            clickMult = 1;
+            autoMult = 1;
+            buffDurationMult = 1;
+            offlineMult = 1;
+            globalMultBonus = 1;
+            goldenBoneExtraMinutes = 0;
+            parkExtraMinutes = 0;
+
+            if (prestigeUpgrades.P1) clickMult *= 1.05;
+            if (prestigeUpgrades.P2) autoMult *= 1.05;
+            if (prestigeUpgrades.P3) buffDurationMult *= 1.05;
+
+            if (prestigeUpgrades.P4) clickMult *= 1.10;
+            if (prestigeUpgrades.P5) autoMult *= 1.10;
+            if (prestigeUpgrades.P6) offlineMult *= 1.10;
+
+            if (prestigeUpgrades.P7) goldenBoneExtraMinutes += 2;
+            if (prestigeUpgrades.P8) parkExtraMinutes += 1;
+            if (prestigeUpgrades.P9) globalMultBonus *= 1.10;
+        }
+
+        function renderAchievements() {
+            achList.innerHTML = "";
+            achievements.forEach(a => {
+                const div = document.createElement("div");
+                div.className = "achievement" + (a.unlocked ? " unlocked" : "");
+                div.textContent = (a.unlocked ? "✔ " : "✖ ") + a.name + " — " + a.desc;
+                achList.appendChild(div);
+            });
+        }
+
+        function unlockAchievement(id) {
+            const ach = achievements.find(a => a.id === id);
+            if (ach && !ach.unlocked) {
+                ach.unlocked = true;
+                alert("Achievement unlocked: " + ach.name + "!");
+                renderAchievements();
+            }
+        }
+
+        function getGlobalProductionMultiplier() {
+            let mult = 1;
+            mult *= (1 + prestige * 0.1);
+            mult *= (1 + leashBonus * 0.1);
+            mult *= globalMultBonus;
+
+            if (goldenBoneBuffActive) {
+                if (Date.now() < goldenBoneBuffEndTime) {
+                    mult *= 1.25;
+                } else {
+                    goldenBoneBuffActive = false;
+                }
+            }
+
+            if (parkActive) mult *= 3;
+
+            return mult;
+        }
+
+        function updateBuffVisuals() {
+            // Golden Bone
+            if (goldenBoneBuffActive && Date.now() < goldenBoneBuffEndTime) {
+                const baseDuration = 10 * 60 * 1000;
+                const totalDuration = baseDuration * buffDurationMult + goldenBoneExtraMinutes * 60 * 1000;
+                const remaining = goldenBoneBuffEndTime - Date.now();
+                const fraction = Math.max(0, Math.min(1, remaining / totalDuration));
+                const angle = 360 * fraction;
+
+                buffRing.style.display = "block";
+                roccoWrapper.classList.add("glow");
+
+                buffRingFill.style.background = `conic-gradient(
+                    rgba(255, 215, 0, 0.9) 0deg,
+                    rgba(255, 215, 0, 0.9) ${angle}deg,
+                    rgba(255, 215, 0, 0.0) ${angle}deg
+                )`;
+            } else {
+                buffRing.style.display = "none";
+                roccoWrapper.classList.remove("glow");
+            }
+
+            // Dog Park Pass
+            if (parkBuffActive && Date.now() < parkBuffEndTime) {
+                const totalDuration = (3 + parkExtraMinutes) * 60 * 1000;
+                const remaining = parkBuffEndTime - Date.now();
+                const fraction = Math.max(0, Math.min(1, remaining / totalDuration));
+                const angle = 360 * fraction;
+
+                parkRing.style.display = "block";
+                parkRingFill.style.background = `conic-gradient(
+                    rgba(100, 200, 255, 0.9) 0deg,
+                    rgba(100, 200, 255, 0.9) ${angle}deg,
+                    rgba(100, 200, 255, 0.0) ${angle}deg
+                )`;
+            } else {
+                parkRing.style.display = "none";
+                parkBuffActive = false;
+            }
+        }
+
+        function spawnParticle(text, x, y) {
+            const p = document.createElement("div");
+            p.className = "particle";
+            p.textContent = text;
+            p.style.left = x + "px";
+            p.style.top = y + "px";
+            document.body.appendChild(p);
+            setTimeout(() => p.remove(), 700);
+        }
+
+        function updateUI() {
+            const globalMult = getGlobalProductionMultiplier();
+            const effectivePerClick = perClick * clickMult * globalMult;
+            const effectiveAuto = autoClickers * autoMult * globalMult;
+
+            document.getElementById("points").textContent = Math.floor(points);
+            document.getElementById("perClick").textContent = effectivePerClick.toFixed(2);
+            document.getElementById("autoCount").textContent = effectiveAuto.toFixed(2);
+            document.getElementById("prestige").textContent = prestige;
+
+            document.getElementById("treatCost").textContent = treatCost;
+            document.getElementById("toyCost").textContent = toyCost;
+            document.getElementById("leashCost").textContent = leashCost;
+            document.getElementById("parkCost").textContent = parkCost;
+            document.getElementById("boneCost").textContent = boneCost;
+
+            prestigePointsSpan.textContent = prestigePoints;
+            prestigeLevelDisplay.textContent = prestige;
+
+            updateBuffVisuals();
+            renderPrestigeTree();
+        }
+
+        clickImg.addEventListener("click", (e) => {
+            const globalMult = getGlobalProductionMultiplier();
+            const gain = perClick * clickMult * globalMult;
+            points += gain;
+            totalPointsEarned += gain;
+
+            barkSound.currentTime = 0;
+            barkSound.play();
+
+            const x = e.clientX || window.innerWidth / 2;
+            const y = e.clientY || window.innerHeight / 2;
+            spawnParticle("+" + Math.floor(gain) + " Kisses", x, y);
+
+            clickImg.classList.add("clicked");
+            setTimeout(() => clickImg.classList.remove("clicked"), 150);
+
+            if (totalPointsEarned >= 1000000) unlockAchievement("millionaire");
+
+            updateUI();
+        });
+
+        document.getElementById("buyTreat").onclick = () => {
+            if (points >= treatCost) {
+                points -= treatCost;
+                perClick++;
+                treatCost += 10;
+                unlockAchievement("firstTreat");
+                updateUI();
+            }
+        };
+
+        document.getElementById("buyToy").onclick = () => {
+            if (points >= toyCost) {
+                points -= toyCost;
+                autoClickers++;
+                toyCost += 20;
+                if (autoClickers >= 10) unlockAchievement("toyCollector");
+                updateUI();
+            }
+        };
+
+        document.getElementById("buyLeash").onclick = () => {
+            if (points >= leashCost) {
+                points -= leashCost;
+                leashBonus++;
+                leashCost += 60;
+                unlockAchievement("walkTime");
+                updateUI();
+            }
+        };
+
+        document.getElementById("buyParkPass").onclick = () => {
+            if (points >= parkCost) {
+                points -= parkCost;
+                parkCost += 100;
+                parkActive = true;
+                parkBuffActive = true;
+
+                const durationMs = (3 + parkExtraMinutes) * 60 * 1000;
+                parkBuffEndTime = Date.now() + durationMs;
+                parkEndTime = parkBuffEndTime;
+
+                parkUses++;
+                if (parkUses >= 5) unlockAchievement("parkRegular");
+                updateUI();
+            }
+        };
+
+        document.getElementById("buyGoldenBone").onclick = () => {
+            if (points >= boneCost) {
+                points -= boneCost;
+
+                goldenBones++;
+                boneCost += 300;
+
+                const baseDuration = 10 * 60 * 1000;
+                const durationMs = baseDuration * buffDurationMult + goldenBoneExtraMinutes * 60 * 1000;
+                goldenBoneBuffActive = true;
+                goldenBoneBuffEndTime = Date.now() + durationMs;
+
+                unlockAchievement("goldenPup");
+                if (goldenBones >= 10) unlockAchievement("dogTycoon");
+
+                const minutes = (durationMs / 60000).toFixed(1);
+                alert("Golden Bone activated! +25% production for " + minutes + " minutes!");
+                updateUI();
+            }
+        };
+
+        document.getElementById("prestigeBtn").onclick = () => {
+            if (points >= 10000) {
+                prestige++;
+                prestigePoints++;
+
+                points = 0;
+                perClick = 1;
+                autoClickers = 0;
+                treatCost = 20;
+                toyCost = 100;
+                leashCost = 500;
+                parkCost = 1000;
+                boneCost = 5000;
+                leashBonus = 0;
+                goldenBones = 0;
+                parkActive = false;
+                parkEndTime = 0;
+                totalPointsEarned = 0;
+                parkUses = 0;
+
+                goldenBoneBuffActive = false;
+                goldenBoneBuffEndTime = 0;
+                parkBuffActive = false;
+                parkBuffEndTime = 0;
+
+                unlockAchievement("prestigePup");
+                recalcPrestigeEffects();
+                alert("Prestige gained! +10% permanent bonus and +1 Prestige Point.");
+                updateUI();
+            } else {
+                alert("You need 10,000 Rocco’s Kisses to prestige.");
+            }
+        };
+
+        setInterval(() => {
+            if (parkActive && Date.now() > parkEndTime) {
+                parkActive = false;
+            }
+
+            const globalMult = getGlobalProductionMultiplier();
+            const gain = autoClickers * autoMult * globalMult;
+            points += gain;
+            totalPointsEarned += gain;
+            if (totalPointsEarned >= 1000000) unlockAchievement("millionaire");
+
+            updateUI();
+        }, 1000);
+
+        document.getElementById("saveBtn").onclick = () => {
+            const data = {
+                points, perClick, autoClickers, prestige,
+                treatCost, toyCost, leashCost, parkCost, boneCost,
+                leashBonus, goldenBones, parkActive, parkEndTime,
+                achievements, totalPointsEarned, parkUses,
+                goldenBoneBuffActive, goldenBoneBuffEndTime,
+                parkBuffActive, parkBuffEndTime,
+                prestigePoints, prestigeUpgrades,
+                theme: document.body.getAttribute("data-theme"),
+                lastSaveTime: Date.now()
+            };
+            localStorage.setItem("roccoKissesSave", JSON.stringify(data));
+            alert("Game saved successfully!");
+        };
+
+        document.getElementById("loadBtn").onclick = () => {
+            const raw = localStorage.getItem("roccoKissesSave");
+            if (!raw) return alert("No save file found.");
+
+            const data = JSON.parse(raw);
+
+            points = data.points || 0;
+            perClick = data.perClick || 1;
+            autoClickers = data.autoClickers || 0;
+            prestige = data.prestige || 0;
+            treatCost = data.treatCost || 20;
+            toyCost = data.toyCost || 100;
+            leashCost = data.leashCost || 500;
+            parkCost = data.parkCost || 1000;
+            boneCost = data.boneCost || 5000;
+            leashBonus = data.leashBonus || 0;
+            goldenBones = data.goldenBones || 0;
+            parkActive = false;
+            parkEndTime = 0;
+            totalPointsEarned = data.totalPointsEarned || 0;
+            parkUses = data.parkUses || 0;
+
+            goldenBoneBuffActive = !!data.goldenBoneBuffActive;
+            goldenBoneBuffEndTime = data.goldenBoneBuffEndTime || 0;
+
+            parkBuffActive = !!data.parkBuffActive;
+            parkBuffEndTime = data.parkBuffEndTime || 0;
+
+            prestigePoints = data.prestigePoints || 0;
+            if (data.prestigeUpgrades) {
+                prestigeUpgrades = {
+                    P1: !!data.prestigeUpgrades.P1,
+                    P2: !!data.prestigeUpgrades.P2,
+                    P3: !!data.prestigeUpgrades.P3,
+                    P4: !!data.prestigeUpgrades.P4,
+                    P5: !!data.prestigeUpgrades.P5,
+                    P6: !!data.prestigeUpgrades.P6,
+                    P7: !!data.prestigeUpgrades.P7,
+                    P8: !!data.prestigeUpgrades.P8,
+                    P9: !!data.prestigeUpgrades.P9
+                };
+            }
+
+            if (Array.isArray(data.achievements)) {
+                data.achievements.forEach(saved => {
+                    const ach = achievements.find(a => a.id === saved.id);
+                    if (ach) ach.unlocked = saved.unlocked;
+                });
+            }
+
+            if (data.theme) {
+                document.body.setAttribute("data-theme", data.theme);
+                updateThemeToggleLabel();
+            }
+
+            recalcPrestigeEffects();
+
+            const lastSaveTime = data.lastSaveTime || Date.now();
+            const now = Date.now();
+            const diffSeconds = Math.floor((now - lastSaveTime) / 1000);
+
+            if (diffSeconds > 0 && autoClickers > 0) {
+                const globalMult = getGlobalProductionMultiplier();
+                const offlineGain = autoClickers * autoMult * globalMult * offlineMult * diffSeconds;
+                points += offlineGain;
+                totalPointsEarned += offlineGain;
+                alert("Rocco earned " + Math.floor(offlineGain) + " Rocco’s Kisses while you were away!");
+            }
+
+            renderAchievements();
+            updateUI();
+            alert("Game loaded!");
+        };
+
+        document.getElementById("resetBtn").onclick = () => {
+            if (!confirm("Are you sure you want to reset everything?")) return;
+            points = 0;
+            perClick = 1;
+            autoClickers = 0;
+            prestige = 0;
+            prestigePoints = 0;
+            treatCost = 20;
+            toyCost = 100;
+            leashCost = 500;
+            parkCost = 1000;
+            boneCost = 5000;
+            leashBonus = 0;
+            goldenBones = 0;
+            parkActive = false;
+            parkEndTime = 0;
+            totalPointsEarned = 0;
+            parkUses = 0;
+
+            goldenBoneBuffActive = false;
+            goldenBoneBuffEndTime = 0;
+            parkBuffActive = false;
+            parkBuffEndTime = 0;
+
+            prestigeUpgrades = {
+                P1: false, P2: false, P3: false,
+                P4: false, P5: false, P6: false,
+                P7: false, P8: false, P9: false
+            };
+            recalcPrestigeEffects();
+
+            achievements.forEach(a => a.unlocked = false);
+            renderAchievements();
+            updateUI();
+            alert("Game reset.");
+        };
+
+        function renderPrestigeTree() {
+            prestigePointsSpan.textContent = prestigePoints;
+            prestigeLevelDisplay.textContent = prestige;
+
+            prestigeTreeContainer.innerHTML = "";
+
+            const tier1Unlocked = prestige >= 1;
+            const tier1Complete = prestigeUpgrades.P1 && prestigeUpgrades.P2 && prestigeUpgrades.P3;
+            const tier2Unlocked = prestige >= 3 && tier1Complete;
+            const tier2Complete = prestigeUpgrades.P4 && prestigeUpgrades.P5 && prestigeUpgrades.P6;
+            const tier3Unlocked = prestige >= 5 && tier2Complete;
+
+            const tiers = [
+                {
+                    name: "Tier 1 (Prestige 1+)",
+                    unlocked: tier1Unlocked,
+                    upgrades: [
+                        { id: "P1", label: "+5% Kisses per Click", cost: 1 },
+                        { id: "P2", label: "+5% Kisses per Second", cost: 1 },
+                        { id: "P3", label: "+5% Golden Bone Duration", cost: 1 }
+                    ]
+                },
+                {
+                    name: "Tier 2 (Prestige 3+, Tier 1 complete)",
+                    unlocked: tier2Unlocked,
+                    upgrades: [
+                        { id: "P4", label: "+10% Kisses per Click", cost: 2 },
+                        { id: "P5", label: "+10% Kisses per Second", cost: 2 },
+                        { id: "P6", label: "+10% Offline Earnings", cost: 2 }
+                    ]
+                },
+                {
+                    name: "Tier 3 (Prestige 5+, Tier 2 complete)",
+                    unlocked: tier3Unlocked,
+                    upgrades: [
+                        { id: "P7", label: "Golden Bone +2 minutes", cost: 3 },
+                        { id: "P8", label: "Dog Park Pass +1 minute", cost: 3 },
+                        { id: "P9", label: "+10% Global Multiplier", cost: 3 }
+                    ]
+                }
+            ];
+
+            tiers.forEach(tier => {
+                const tierDiv = document.createElement("div");
+                tierDiv.className = "prestige-tier" + (tier.unlocked ? "" : " locked");
+
+                const h4 = document.createElement("h4");
+                h4.textContent = tier.name;
+                tierDiv.appendChild(h4);
+
+                tier.upgrades.forEach(up => {
+                    const row = document.createElement("div");
+                    row.className = "prestige-upgrade";
+                    if (prestigeUpgrades[up.id]) row.classList.add("purchased");
+
+                    const labelSpan = document.createElement("span");
+                    labelSpan.textContent = `${up.label} (Cost: ${up.cost} PP)`;
+
+                    const rightSide = document.createElement("div");
+
+                    const statusSpan = document.createElement("span");
+                    statusSpan.className = "status";
+                    statusSpan.textContent = prestigeUpgrades[up.id] ? "✔ Purchased" : "";
+
+                    const btn = document.createElement("button");
+                    btn.textContent = "Buy";
+                    btn.disabled = !tier.unlocked || prestigeUpgrades[up.id] || prestigePoints < up.cost;
+                    btn.onclick = () => {
+                        if (prestigePoints >= up.cost && !prestigeUpgrades[up.id] && tier.unlocked) {
+                            prestigePoints -= up.cost;
+                            prestigeUpgrades[up.id] = true;
+                            recalcPrestigeEffects();
+                            updateUI();
+                        }
+                    };
+
+                    rightSide.appendChild(btn);
+                    rightSide.appendChild(statusSpan);
+
+                    row.appendChild(labelSpan);
+                    row.appendChild(rightSide);
+
+                    tierDiv.appendChild(row);
+                });
+
+                prestigeTreeContainer.appendChild(tierDiv);
+            });
+        }
+
+        prestigeTreeBtn.onclick = () => {
+            prestigeOverlay.style.display = "flex";
+            renderPrestigeTree();
+        };
+
+        prestigeClose.onclick = () => {
+            prestigeOverlay.style.display = "none";
+        };
+
+        prestigeOverlay.addEventListener("click", (e) => {
+            if (e.target === prestigeOverlay) {
+                prestigeOverlay.style.display = "none";
+            }
+        });
+
+        function updateThemeToggleLabel() {
+            const theme = document.body.getAttribute("data-theme");
+            if (theme === "light") {
+                themeToggle.textContent = "🌞 Light Mode";
+            } else {
+                themeToggle.textContent = "🌙 Dark Mode";
+            }
+        }
+
+        themeToggle.onclick = () => {
+            const current = document.body.getAttribute("data-theme");
+            const next = current === "dark" ? "light" : "dark";
+            document.body.setAttribute("data-theme", next);
+            localStorage.setItem("roccoTheme", next);
+            updateThemeToggleLabel();
+        };
+
+        (function initTheme() {
+            const savedTheme = localStorage.getItem("roccoTheme");
+            if (savedTheme === "light" || savedTheme === "dark") {
+                document.body.setAttribute("data-theme", savedTheme);
+            } else {
+                document.body.setAttribute("data-theme", "dark");
+            }
+            updateThemeToggleLabel();
+        })();
+
+        recalcPrestigeEffects();
+        renderAchievements();
+        updateUI();
+    </script>
+
+</body>
+</html>
