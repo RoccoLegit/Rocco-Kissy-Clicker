@@ -382,7 +382,7 @@
         </button>
 
         <button id="prestigeBtn">
-            Prestige (First ×5, then ×2 permanent bonus) — Requires: 10,000 Rocco’s Kisses
+            Prestige — Requires: 10,000 Rocco’s Kisses
         </button>
 
         <button id="prestigeTreeBtn">Prestige Tree</button>
@@ -406,7 +406,9 @@
             </div>
             <div id="prestigePointsDisplay">
                 Prestige Level: <span id="prestigeLevelDisplay">0</span> |
-                Prestige Points: <span id="prestigePoints">0</span>
+                Prestige Points: <span id="prestigePoints">0</span> |
+                Prestige Multiplier: <span id="prestigeMultDisplay">1</span>
+                (<span id="prestigeMultNote">first prestige will be ×5</span>)
             </div>
             <div id="prestigeTree"></div>
         </div>
@@ -491,6 +493,8 @@
         const prestigePointsSpan = document.getElementById("prestigePoints");
         const prestigeLevelDisplay = document.getElementById("prestigeLevelDisplay");
         const prestigeTreeContainer = document.getElementById("prestigeTree");
+        const prestigeMultDisplay = document.getElementById("prestigeMultDisplay");
+        const prestigeMultNote = document.getElementById("prestigeMultNote");
 
         function recalcPrestigeEffects() {
             clickMult = 1;
@@ -639,6 +643,23 @@
             prestigePointsSpan.textContent = prestigePoints;
             prestigeLevelDisplay.textContent = prestige;
 
+            // Dynamic prestige multiplier display + note
+            const currentMult = getPrestigeMultiplier();
+            prestigeMultDisplay.textContent = currentMult.toFixed(0);
+            if (prestige === 0) {
+                prestigeMultNote.textContent = "first prestige will be ×5";
+            } else {
+                prestigeMultNote.textContent = "each new prestige gives ×2";
+            }
+
+            // Dynamic prestige button text
+            const prestigeBtn = document.getElementById("prestigeBtn");
+            if (prestige === 0) {
+                prestigeBtn.innerHTML = "Prestige (×5 permanent bonus) — Requires: 10,000 Rocco’s Kisses";
+            } else {
+                prestigeBtn.innerHTML = "Prestige (×2 permanent bonus) — Requires: 10,000 Rocco’s Kisses";
+            }
+
             updateBuffVisuals();
             renderPrestigeTree();
         }
@@ -759,7 +780,13 @@
 
                 unlockAchievement("prestigePup");
                 recalcPrestigeEffects();
-                alert("Prestige gained! First prestige gives ×5, later prestiges give ×2 permanent bonus. You also gained 1 Prestige Point.");
+
+                if (prestige === 1) {
+                    alert("Prestige gained! Your permanent multiplier is now ×5 and you gained 1 Prestige Point.");
+                } else {
+                    alert("Prestige gained! Your permanent multiplier increased by ×2 and you gained 1 Prestige Point.");
+                }
+
                 updateUI();
             } else {
                 alert("You need 10,000 Rocco’s Kisses to prestige.");
@@ -911,17 +938,17 @@
             prestigePointsSpan.textContent = prestigePoints;
             prestigeLevelDisplay.textContent = prestige;
 
-            prestigeTreeContainer.innerHTML = "";
-
             const tier1Unlocked = prestige >= 1;
             const tier1Complete = prestigeUpgrades.P1 && prestigeUpgrades.P2 && prestigeUpgrades.P3;
             const tier2Unlocked = prestige >= 3 && tier1Complete;
             const tier2Complete = prestigeUpgrades.P4 && prestigeUpgrades.P5 && prestigeUpgrades.P6;
             const tier3Unlocked = prestige >= 5 && tier2Complete;
 
+            prestigeTreeContainer.innerHTML = "";
+
             const tiers = [
                 {
-                    name: "Tier 1 (Prestige 1+)",
+                    name: tier1Unlocked ? "Tier 1 (Unlocked)" : "Tier 1 (Prestige 1+)",
                     unlocked: tier1Unlocked,
                     upgrades: [
                         { id: "P1", label: "×1.5 Kisses per Click", cost: 1 },
@@ -930,7 +957,7 @@
                     ]
                 },
                 {
-                    name: "Tier 2 (Prestige 3+, Tier 1 complete)",
+                    name: tier2Unlocked ? "Tier 2 (Unlocked)" : "Tier 2 (Prestige 3+, Tier 1 complete)",
                     unlocked: tier2Unlocked,
                     upgrades: [
                         { id: "P4", label: "×3 Kisses per Click", cost: 2 },
@@ -939,7 +966,7 @@
                     ]
                 },
                 {
-                    name: "Tier 3 (Prestige 5+, Tier 2 complete)",
+                    name: tier3Unlocked ? "Tier 3 (Unlocked)" : "Tier 3 (Prestige 5+, Tier 2 complete)",
                     unlocked: tier3Unlocked,
                     upgrades: [
                         { id: "P7", label: "+3 minutes Golden Bone", cost: 3 },
@@ -1045,6 +1072,3 @@
 
 </body>
 </html>
-
-
-
