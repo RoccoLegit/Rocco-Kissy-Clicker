@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Rocco Kisses!</title>
+    <title>Rocco Kissy Clicker</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <style>
@@ -336,7 +336,7 @@
 <body data-theme="dark">
 
     <div id="topBar">
-        <div><strong>Rocco Kisses!</strong></div>
+        <div><strong>Rocco Kissy Clicker</strong></div>
         <button id="themeToggle">🌙 Dark Mode</button>
     </div>
 
@@ -369,19 +369,19 @@
         </button>
 
         <button id="buyLeash">
-            Leash Upgrade (+10% all production) — Cost: <span id="leashCost">500</span> Rocco’s Kisses
+            Leash Upgrade (×1.75 all production) — Cost: <span id="leashCost">500</span> Rocco’s Kisses
         </button>
 
         <button id="buyParkPass">
-            Dog Park Pass (x3 for 3 minutes) — Cost: <span id="parkCost">1000</span> Rocco’s Kisses
+            Dog Park Pass (×4 for 3 minutes) — Cost: <span id="parkCost">1000</span> Rocco’s Kisses
         </button>
 
         <button id="buyGoldenBone">
-            Golden Bone (+25% boost for 10 minutes) — Cost: <span id="boneCost">5000</span> Rocco’s Kisses
+            Golden Bone (×5 boost for 10 minutes) — Cost: <span id="boneCost">5000</span> Rocco’s Kisses
         </button>
 
         <button id="prestigeBtn">
-            Prestige (Reset for +10% permanent bonus) — Requires: 10,000 Rocco’s Kisses
+            Prestige (Reset for ×5 permanent bonus) — Requires: 10,000 Rocco’s Kisses
         </button>
 
         <button id="prestigeTreeBtn">Prestige Tree</button>
@@ -534,19 +534,27 @@
 
         function getGlobalProductionMultiplier() {
             let mult = 1;
-            mult *= (1 + prestige * 0.1);
-            mult *= (1 + leashBonus * 0.1);
+
+            // Prestige: ×5 per prestige
+            mult *= Math.pow(5, prestige);
+
+            // Leash: ×1.75 per upgrade
+            mult *= Math.pow(1.75, leashBonus);
+
+            // Global prestige tree bonus
             mult *= globalMultBonus;
 
+            // Golden Bone: ×5 while active
             if (goldenBoneBuffActive) {
                 if (Date.now() < goldenBoneBuffEndTime) {
-                    mult *= 1.25;
+                    mult *= 5;
                 } else {
                     goldenBoneBuffActive = false;
                 }
             }
 
-            if (parkActive) mult *= 3;
+            // Dog Park Pass: ×4 while active
+            if (parkActive) mult *= 4;
 
             return mult;
         }
@@ -709,7 +717,7 @@
                 if (goldenBones >= 10) unlockAchievement("dogTycoon");
 
                 const minutes = (durationMs / 60000).toFixed(1);
-                alert("Golden Bone activated! +25% production for " + minutes + " minutes!");
+                alert("Golden Bone activated! ×5 production for " + minutes + " minutes!");
                 updateUI();
             }
         };
@@ -741,7 +749,7 @@
 
                 unlockAchievement("prestigePup");
                 recalcPrestigeEffects();
-                alert("Prestige gained! +10% permanent bonus and +1 Prestige Point.");
+                alert("Prestige gained! ×5 permanent bonus and +1 Prestige Point.");
                 updateUI();
             } else {
                 alert("You need 10,000 Rocco’s Kisses to prestige.");
