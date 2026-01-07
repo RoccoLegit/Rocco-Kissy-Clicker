@@ -370,19 +370,19 @@
         </button>
 
         <button id="buyLeash">
-            Leash Upgrade (×1.75 all production) — Cost: <span id="leashCost">500</span> Rocco’s Kisses
+            Leash Upgrade (×1.75 all production, resets on prestige) — Cost: <span id="leashCost">500</span> Rocco’s Kisses
         </button>
 
         <button id="buyParkPass">
-            Dog Park Pass (×4 for 3 minutes) — Cost: <span id="parkCost">1000</span> Rocco’s Kisses
+            Dog Park Pass (×3 for 3 minutes) — Cost: <span id="parkCost">1000</span> Rocco’s Kisses
         </button>
 
         <button id="buyGoldenBone">
-            Golden Bone (×5 boost for 10 minutes) — Cost: <span id="boneCost">5000</span> Rocco’s Kisses
+            Golden Bone (×5 boost for 5 minutes) — Cost: <span id="boneCost">5000</span> Rocco’s Kisses
         </button>
 
         <button id="prestigeBtn">
-            Prestige (Reset for ×5 permanent bonus) — Requires: 10,000 Rocco’s Kisses
+            Prestige (First ×5, then ×2 permanent bonus) — Requires: 10,000 Rocco’s Kisses
         </button>
 
         <button id="prestigeTreeBtn">Prestige Tree</button>
@@ -470,7 +470,7 @@
             { id: "parkRegular", name: "Park Regular", desc: "Use Dog Park Pass 5 times", unlocked: false },
             { id: "goldenPup", name: "Golden Pup", desc: "Buy 1 Golden Bone", unlocked: false },
             { id: "prestigePup", name: "Prestige Pup", desc: "Prestige once", unlocked: false },
-            { id: "millionaire", name: "Rocco’s Favorite Human", desc: "Earn 1,000,000 Rocco’s Kisses", unlocked: false },
+            { id: "millionaire", name: "Rocco’s Favorite Human", desc: "Earn 1,000,000,000,000 Rocco’s Kisses", unlocked: false },
             { id: "dogTycoon", name: "Dog Tycoon", desc: "Own 10 Golden Bones", unlocked: false }
         ];
 
@@ -501,17 +501,20 @@
             goldenBoneExtraMinutes = 0;
             parkExtraMinutes = 0;
 
-            if (prestigeUpgrades.P1) clickMult *= 1.05;
-            if (prestigeUpgrades.P2) autoMult *= 1.05;
-            if (prestigeUpgrades.P3) buffDurationMult *= 1.05;
+            // Tier 1
+            if (prestigeUpgrades.P1) clickMult *= 1.5;          // ×1.5 KPC
+            if (prestigeUpgrades.P2) autoMult *= 1.5;           // ×1.5 KPS
+            if (prestigeUpgrades.P3) buffDurationMult *= 1.5;   // ×1.5 Golden Bone duration
 
-            if (prestigeUpgrades.P4) clickMult *= 1.10;
-            if (prestigeUpgrades.P5) autoMult *= 1.10;
-            if (prestigeUpgrades.P6) offlineMult *= 1.10;
+            // Tier 2
+            if (prestigeUpgrades.P4) clickMult *= 3;            // ×3 KPC
+            if (prestigeUpgrades.P5) autoMult *= 3;             // ×3 KPS
+            if (prestigeUpgrades.P6) offlineMult *= 3;          // ×3 offline earnings
 
-            if (prestigeUpgrades.P7) goldenBoneExtraMinutes += 2;
-            if (prestigeUpgrades.P8) parkExtraMinutes += 1;
-            if (prestigeUpgrades.P9) globalMultBonus *= 1.10;
+            // Tier 3
+            if (prestigeUpgrades.P7) goldenBoneExtraMinutes += 3; // +3 minutes Golden Bone
+            if (prestigeUpgrades.P8) parkExtraMinutes += 2;       // +2 minutes Dog Park
+            if (prestigeUpgrades.P9) globalMultBonus *= 4;        // ×4 global multiplier
         }
 
         function renderAchievements() {
@@ -533,13 +536,19 @@
             }
         }
 
+        function getPrestigeMultiplier() {
+            if (prestige <= 0) return 1;
+            // Prestige 1: ×5, each additional prestige: ×2
+            return 5 * Math.pow(2, prestige - 1);
+        }
+
         function getGlobalProductionMultiplier() {
             let mult = 1;
 
-            // Prestige: ×5 per prestige
-            mult *= Math.pow(5, prestige);
+            // Prestige permanent multiplier
+            mult *= getPrestigeMultiplier();
 
-            // Leash: ×1.75 per upgrade
+            // Leash: ×1.75 per upgrade (resets on prestige)
             mult *= Math.pow(1.75, leashBonus);
 
             // Global prestige tree bonus
@@ -554,8 +563,8 @@
                 }
             }
 
-            // Dog Park Pass: ×4 while active
-            if (parkActive) mult *= 4;
+            // Dog Park Pass: ×3 while active
+            if (parkActive) mult *= 3;
 
             return mult;
         }
@@ -563,7 +572,7 @@
         function updateBuffVisuals() {
             // Golden Bone
             if (goldenBoneBuffActive && Date.now() < goldenBoneBuffEndTime) {
-                const baseDuration = 10 * 60 * 1000;
+                const baseDuration = 5 * 60 * 1000; // 5 minutes base
                 const totalDuration = baseDuration * buffDurationMult + goldenBoneExtraMinutes * 60 * 1000;
                 const remaining = goldenBoneBuffEndTime - Date.now();
                 const fraction = Math.max(0, Math.min(1, remaining / totalDuration));
@@ -650,7 +659,7 @@
             clickImg.classList.add("clicked");
             setTimeout(() => clickImg.classList.remove("clicked"), 150);
 
-            if (totalPointsEarned >= 1000000) unlockAchievement("millionaire");
+            if (totalPointsEarned >= 1000000000000) unlockAchievement("millionaire");
 
             updateUI();
         });
@@ -709,7 +718,7 @@
                 goldenBones++;
                 boneCost += 300;
 
-                const baseDuration = 10 * 60 * 1000;
+                const baseDuration = 5 * 60 * 1000; // 5 minutes base
                 const durationMs = baseDuration * buffDurationMult + goldenBoneExtraMinutes * 60 * 1000;
                 goldenBoneBuffActive = true;
                 goldenBoneBuffEndTime = Date.now() + durationMs;
@@ -750,7 +759,7 @@
 
                 unlockAchievement("prestigePup");
                 recalcPrestigeEffects();
-                alert("Prestige gained! ×5 permanent bonus and +1 Prestige Point.");
+                alert("Prestige gained! First prestige gives ×5, later prestiges give ×2 permanent bonus. You also gained 1 Prestige Point.");
                 updateUI();
             } else {
                 alert("You need 10,000 Rocco’s Kisses to prestige.");
@@ -766,7 +775,7 @@
             const gain = autoClickers * autoMult * globalMult;
             points += gain;
             totalPointsEarned += gain;
-            if (totalPointsEarned >= 1000000) unlockAchievement("millionaire");
+            if (totalPointsEarned >= 1000000000000) unlockAchievement("millionaire");
 
             updateUI();
         }, 1000);
@@ -915,27 +924,27 @@
                     name: "Tier 1 (Prestige 1+)",
                     unlocked: tier1Unlocked,
                     upgrades: [
-                        { id: "P1", label: "+5% Kisses per Click", cost: 1 },
-                        { id: "P2", label: "+5% Kisses per Second", cost: 1 },
-                        { id: "P3", label: "+5% Golden Bone Duration", cost: 1 }
+                        { id: "P1", label: "×1.5 Kisses per Click", cost: 1 },
+                        { id: "P2", label: "×1.5 Kisses per Second", cost: 1 },
+                        { id: "P3", label: "×1.5 Golden Bone Duration", cost: 1 }
                     ]
                 },
                 {
                     name: "Tier 2 (Prestige 3+, Tier 1 complete)",
                     unlocked: tier2Unlocked,
                     upgrades: [
-                        { id: "P4", label: "+10% Kisses per Click", cost: 2 },
-                        { id: "P5", label: "+10% Kisses per Second", cost: 2 },
-                        { id: "P6", label: "+10% Offline Earnings", cost: 2 }
+                        { id: "P4", label: "×3 Kisses per Click", cost: 2 },
+                        { id: "P5", label: "×3 Kisses per Second", cost: 2 },
+                        { id: "P6", label: "×3 Offline Earnings", cost: 2 }
                     ]
                 },
                 {
                     name: "Tier 3 (Prestige 5+, Tier 2 complete)",
                     unlocked: tier3Unlocked,
                     upgrades: [
-                        { id: "P7", label: "Golden Bone +2 minutes", cost: 3 },
-                        { id: "P8", label: "Dog Park Pass +1 minute", cost: 3 },
-                        { id: "P9", label: "+10% Global Multiplier", cost: 3 }
+                        { id: "P7", label: "+3 minutes Golden Bone", cost: 3 },
+                        { id: "P8", label: "+2 minutes Dog Park Pass", cost: 3 },
+                        { id: "P9", label: "×4 Global Multiplier", cost: 3 }
                     ]
                 }
             ];
@@ -1036,5 +1045,6 @@
 
 </body>
 </html>
+
 
 
